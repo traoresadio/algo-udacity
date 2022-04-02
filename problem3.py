@@ -5,7 +5,6 @@ class Huffman:
 
     def __init__(self):
         self.prefix_code = {}
-        self.heap = []
 
     def get_occurence(self, string):
         result = {}
@@ -17,26 +16,26 @@ class Huffman:
         return result
 
     def populate_heap(self, result_occ):
-
+        heap =[]
         for key in result_occ:
             node = Node(key, result_occ[key])
-            heapq.heappush(self.heap, node)
-        #print(self.heap)
-        return self.heap
+            heapq.heappush(heap, node)
+        #print(heap)
+        return heap
 
-    def building_tree(self):
-        while len(self.heap) > 1:
-            node1 = heapq.heappop(self.heap)
-            node2 = heapq.heappop(self.heap)
+    def building_tree(self,heap):
+        while len(heap) > 1:
+            node1 = heapq.heappop(heap)
+            node2 = heapq.heappop(heap)
             addition = Node(None, node1.value + node2.value)
             addition.left = node1
             addition.right = node2
-            heapq.heappush(self.heap, addition)
-        #print(self.heap)
-        return self.heap
+            heapq.heappush(heap, addition)
+        print(heap)
+        return heap
 
-    def creating_prefix(self):
-        root = heapq.heappop(self.heap)
+    def creating_prefix(self,heap):
+        root = heap[0]
         current_node = ""
         self.traversing_tree(root, current_node)
 
@@ -59,26 +58,32 @@ class Huffman:
         encoded_data = ""
         my_dict = self.get_occurence(string)
         pop_heap = self.populate_heap(my_dict)
-        my_tree = self.building_tree()
+        my_tree = self.building_tree(pop_heap)
         print(my_tree)
-        self.creating_prefix()
+        self.creating_prefix(my_tree)
         encoded_data = self.create_result(string)
         return encoded_data, my_tree
 
-    def huffman_decoding(self, encoded_dta, tree):
-        result = ""
-        node = tree.pop()
-        print(tree)
+    def huffman_decoding(self, encoded_dta, param_tree):
+        decoded = ""
+        node = heapq.heappop(param_tree)
+        print('node')
+        print(node)
+        left = node.get_left()
+        print('lefti')
+        print(left)
+
         for bit in encoded_dta:
-            if bit == 0:
+            if bit == '0':
                 node = node.left
 
             else:
                 node = node.right
             if node.key is not None:
-                result += node.key
-                node = tree
-        return result
+                decoded += node.key
+                node = param_tree
+        print(decoded)
+        return decoded
 
 
 class Node:
@@ -99,6 +104,9 @@ class Node:
 
     def set_right(self, value):
         self.right = value
+
+    def has_right(self):
+        return self.right is not None
 
     def __gt__(self, other):
         if not other:
@@ -125,8 +133,9 @@ class Node:
 if __name__ == "__main__":
     text = "AAAABBBNNNVVCC"
     huffmanClass = Huffman()
-    code, tree = huffmanClass.huffman_encoding(text)
+    code, the_tree = huffmanClass.huffman_encoding(text)
     print(code)
-    #print(tree)
-    result = huffmanClass.huffman_decoding(code, tree)
+    print('main')
+    print(the_tree)
+    result = huffmanClass.huffman_decoding(code, the_tree)
     print(result)
